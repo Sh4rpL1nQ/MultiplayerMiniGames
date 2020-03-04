@@ -1,18 +1,14 @@
-﻿using ChessWebApp.Models.Pieces;
+﻿using ChessWebApp.Models.EventArguments;
+using ChessWebApp.Models.Pieces;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using ChessWebApp.Models.EventArguments;
 
 namespace ChessWebApp.Models
 {
     public class Board : ICloneable
     {
         private string[] letters = new string[] { "A", "B", "C", "D", "E", "F", "G", "H" };
-        private Square selectedSquare;
-        private Color topColor;
 
         private Dictionary<string, Piece> setup = new Dictionary<string, Piece>()
         {
@@ -38,22 +34,22 @@ namespace ChessWebApp.Models
             currentPossibleMoves = new List<Move>();
         }
 
-        public void MakeBoard(Color topColor = Color.White)
+        public void MakeBoard()
         {
-            this.topColor = topColor;
             var toggle = Color.White;
             Squares = new List<Square>();
             for (int y = 0; y < 8; y++)
             {
                 for (int x = 0; x < 8; x++)
                 {
-                    var name = letters[x] + (topColor == Color.White ? (y + 1) : (8 - y));
-                    var square = new Square() 
-                    { 
-                        Position = topColor == Color.White ? new Position(x, y) : new Position(x, 7 - y), 
+                    var name = letters[x] + (y + 1);
+                    var square = new Square()
+                    {
+                        Position = new Position(x, y),
                         Piece = setup.FirstOrDefault(x => x.Key.Equals(name)).Value,
                         Color = toggle,
-                        Name =  name};
+                        Name = name
+                    };
                     if (x != 7)
                         toggle = toggle == Color.White ? Color.Black : Color.White;
 
@@ -77,7 +73,7 @@ namespace ChessWebApp.Models
             var king = prediction.GetKingSquare(color);
             var allEnemySquares = prediction.GetAllSquaresWithPieces(Switch(color));
 
-            if (king == null) 
+            if (king == null)
                 return false;
 
             foreach (var enemySquare in allEnemySquares)
@@ -101,9 +97,9 @@ namespace ChessWebApp.Models
             return null;
         }
 
-        private Color Switch(Color color) 
-        { 
-            return color == Color.White ? Color.Black : Color.White; 
+        private Color Switch(Color color)
+        {
+            return color == Color.White ? Color.Black : Color.White;
         }
 
         public IEnumerable<Square> GetAllSquaresWithPieces(Color color)
@@ -113,7 +109,7 @@ namespace ChessWebApp.Models
                     yield return square;
 
         }
-        
+
         public IEnumerable<Move> CalculatePossibleMoves(Color color)
         {
             var ownSquares = GetAllSquaresWithPieces(color);
@@ -137,7 +133,7 @@ namespace ChessWebApp.Models
                     {
                         var move = new Move(this, start, square, MoveType.Normal);
                         if (!IsKingChecked(color, move))
-                            list.Add(move);      
+                            list.Add(move);
                     }
                 }
             }
@@ -158,7 +154,7 @@ namespace ChessWebApp.Models
                 (end.Position == start.Position + new Position(-1, -1) && GetSquareAtPosition(start.Position + new Position(-1, 0))?.Piece?.Color == Color.White))
                 square = end;
 
-            if (square != null) 
+            if (square != null)
             {
                 var move = new Move(this, start, square, MoveType.EnPassant);
                 if (!IsKingChecked(start.Color, move))
@@ -177,9 +173,9 @@ namespace ChessWebApp.Models
         {
             if (!(start.Piece is King)) return null;
 
-            var rooks = GetAllSquaresWithPieces(start.Color).Where(x => x.Piece is Rook && x.Piece.NumberOfMoves == 0 );
+            var rooks = GetAllSquaresWithPieces(start.Color).Where(x => x.Piece is Rook && x.Piece.NumberOfMoves == 0);
 
-            if (rooks.Count() == 0 || start.Piece.NumberOfMoves != 0 || IsKingChecked(start.Color) != null) 
+            if (rooks.Count() == 0 || start.Piece.NumberOfMoves != 0 || IsKingChecked(start.Color) != null)
                 return null;
 
             foreach (var rook in rooks)
@@ -200,8 +196,8 @@ namespace ChessWebApp.Models
                     }
 
                     return new Move(this, start, end, MoveType.Castle);
-                }                   
-            }            
+                }
+            }
 
             return null;
         }
@@ -261,7 +257,7 @@ namespace ChessWebApp.Models
 
                 if (start == b.Position)
                     yield break;
-                
+
                 yield return GetSquareAtPosition(start);
             }
         }
@@ -271,14 +267,14 @@ namespace ChessWebApp.Models
             if (start)
             {
                 ClearBoardSelections();
-                square.IsSelected = true;                
+                square.IsSelected = true;
                 CalculatePossibleMovesForPiece(square.Piece);
             }
             else
             {
                 var current = currentPossibleMoves.FirstOrDefault(x => x.End.Position == square.Position);
                 if (current != null)
-                {                    
+                {
                     current.Do();
                     ClearBoardSelections();
                     return true;
@@ -287,8 +283,6 @@ namespace ChessWebApp.Models
 
             return false;
         }
-
-        public event EventHandler MoveDone;
 
         public List<Move> CalculatePossibleMovesForPiece(Piece piece)
         {
@@ -310,7 +304,7 @@ namespace ChessWebApp.Models
             {
                 square.PossibleMove = false;
                 square.IsSelected = false;
-            }                
+            }
         }
 
         public Piece ShiftPiece(Square start, Square end)

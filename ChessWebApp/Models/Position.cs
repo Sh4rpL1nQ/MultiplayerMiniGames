@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace ChessWebApp.Models
 {
@@ -74,7 +72,7 @@ namespace ChessWebApp.Models
 
                 if (!start.IsInBoard())
                     return false;
-            }               
+            }
 
             return true;
         }

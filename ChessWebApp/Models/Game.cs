@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows;
-using ChessWebApp.Models;
-using ChessWebApp.Models.EventArguments;
+﻿using ChessWebApp.Models.EventArguments;
+using System;
 
 namespace ChessWebApp.Models
 {
@@ -16,7 +8,7 @@ namespace ChessWebApp.Models
         public Game(Player player1, Player player2)
         {
             ChessBoard = new Board();
-            ChessBoard.MakeBoard(Color.White);
+            ChessBoard.MakeBoard();
 
             Player1 = player1;
             Player2 = player2;
@@ -40,9 +32,9 @@ namespace ChessWebApp.Models
             {
                 var b = ChessBoard.PlayerSelectedSquare(square, false);
                 if (b)
-                    ChangeTurns(); 
+                    ChangeTurns();
                 return b;
-            }                
+            }
         }
 
         public event EventHandler OnGameOver;

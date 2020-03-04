@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace ChessWebApp.Models
 {
@@ -40,7 +37,7 @@ namespace ChessWebApp.Models
                 Color = Color,
                 Name = Name,
                 Position = Position.Clone() as Position,
-                Piece = Piece?.Clone() as Piece              
+                Piece = Piece?.Clone() as Piece
             };
         }
 

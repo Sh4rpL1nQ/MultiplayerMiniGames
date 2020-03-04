@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ChessWebApp.Models.Pieces
 {
@@ -9,12 +7,12 @@ namespace ChessWebApp.Models.Pieces
         public override string Abbrevation => "K";
 
         public override IEnumerable<Position> Directions =>
-            new List<Position>() { new Position(1, -1), new Position(1, 1), new Position(0, -1), new Position(-1, 0), 
+            new List<Position>() { new Position(1, -1), new Position(1, 1), new Position(0, -1), new Position(-1, 0),
                                    new Position(0, 1), new Position(1, 0), new Position(-1, -1), new Position(-1, 1) };
 
         public King(Color color) : base(color)
         {
-            
+
         }
 
         public override bool IsReachable(Position dir, Square square)

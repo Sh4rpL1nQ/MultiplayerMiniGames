@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ChessWebApp.Models.Pieces
 {
     public class Queen : Piece
-    { 
+    {
         public override string Abbrevation => "Q";
 
-        public override IEnumerable<Position> Directions => 
+        public override IEnumerable<Position> Directions =>
             new List<Position>() { new Position(1, -1), new Position(1, 1), new Position(0, -1), new Position(-1, 0),
                                    new Position(0, 1), new Position(1, 0), new Position(-1, -1), new Position(-1, 1) };
 

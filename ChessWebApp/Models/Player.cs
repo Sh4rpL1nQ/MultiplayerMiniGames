@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using ChessWebApp.Models.EventArguments;
+﻿using ChessWebApp.Models.EventArguments;
+using System;
 
 namespace ChessWebApp.Models
 {
-    public class Player 
+    public class Player
     {
         private TimeSpan timeRemaining;
 
@@ -40,14 +38,14 @@ namespace ChessWebApp.Models
             InitializeMove();
         }
 
-        public Player (string userName, string connectionId)
+        public Player(string userName, string connectionId)
         {
             UserName = userName;
             Id = connectionId;
             InitializeMove();
         }
 
-        
+
         public void InitializeMove()
         {
             if (Color == Color.White)

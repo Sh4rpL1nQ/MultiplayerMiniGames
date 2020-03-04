@@ -99,7 +99,7 @@
 
                         function ClickEvent() {
                             if (playerId == game.movingPlayer.id) {
-                                connection.invoke("SquareSelected", thisGame.id, playerColor, entry.position.posX, entry.position.posY);
+                                connection.invoke("SquareSelected", thisGame.id, entry.position.posX, entry.position.posY);
                                 }
                         }
 

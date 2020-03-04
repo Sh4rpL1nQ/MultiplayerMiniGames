@@ -1,11 +1,6 @@
-﻿using ChessWebApp.Models.Pieces;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Windows;
 
 namespace ChessWebApp.Models
 {
@@ -51,7 +46,7 @@ namespace ChessWebApp.Models
             {
                 foreach (var move in allMoves)
                     if (board.GetSquareAtPosition(move).Piece != null)
-                            return false;
+                        return false;
 
                 return true;
             }

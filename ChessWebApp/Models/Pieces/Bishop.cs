@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace ChessWebApp.Models.Pieces
 {
@@ -8,7 +6,7 @@ namespace ChessWebApp.Models.Pieces
     {
         public override string Abbrevation => "B";
 
-        public override IEnumerable<Position> Directions => 
+        public override IEnumerable<Position> Directions =>
             new List<Position>() { new Position(1, -1), new Position(1, 1), new Position(-1, -1), new Position(-1, 1) };
 
         public Bishop(Color color) : base(color)

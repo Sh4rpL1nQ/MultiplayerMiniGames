@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ChessWebApp.Hubs;
-using ChessWebApp.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using ChessWebApp.Hubs;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
 
 namespace ChessWebApp.Pages
 {
