@@ -1,10 +1,136 @@
 ﻿@page
+@using ChessWebApp.Models.Helper;
+@using ChessWebApp.Models;
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<main id="main" class="container text-center">
+    <h1>Chess</h1>
+
+    <div class="form-inline">
+        <div class="form-group" id="usernameGroup">
+            <label class="sr-only control-label" for="username">Username</label>
+            <input type="text" class="form-control" id="username" placeholder="Username" autofocus />
+        </div>
+        <button type="submit" id="findGame" class="btn btn-primary">Find Game</button>
+        <p id="status" class="help-block">Please enter your desired username.</p>
+        <p id="hidden" class="help-block" style="visibility:hidden"></p>
+    </div>
+</main>
+<p id="playerAtTurn"></p>
+<p>ist am Zug!!!</p>
+<div id="board" class="chessboard">
+    
 </div>
+
+<script type="text/javascript">
+
+            $(function () {
+                var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
+                var playerId;
+                var playerColor;
+                var thisGame;
+                document.getElementById("findGame").disabled = true;
+
+                $(".chessboard").on("load", function () {
+                    console.log("target loaded");
+                });
+
+                connection.start().then(function () {
+                    document.getElementById("findGame").disabled = false;
+                });
+
+                connection.on("PlayerJoined", function (player) {
+                    playerId = player.id;
+                });
+
+                connection.on("OpponentLeft", function () {
+                    $('#status').html("Opponent has left. Game over.");
+                    endGame();
+                });
+
+                connection.on("WaitingList", function () {
+                    $('#status').html("Waiting for an opponent.");
+                });
+
+                $('#findGame').click(function () {
+                    var chosenUsername = $('#username').val();
+                    connection.invoke("FindGame", chosenUsername);
+                });
+
+                $('#username').keypress(function (e) {
+                    if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+                        $('#findGame').click();
+                        return false;
+                    }
+                    return true;
+                });
+
+                connection.on("Start", function (game) {
+                    if (game.id != "") {
+                        thisGame = game;
+                        playerColor = (playerId == game.player1.id) ? game.player1.color : game.player2.color;
+                        updateBoard(game, true);
+                        document.getElementById('playerAtTurn').innerText = game.movingPlayer.userName;              
+                    }
+                });
+
+                connection.on("UpdateBoard", function (game, first) {
+                    updateBoard(game, first);
+                    document.getElementById('playerAtTurn').innerText = game.movingPlayer.userName;
+                });
+
+                function reverseChildren(parent) {
+                    for (var i = 1; i < parent.childNodes.length; i++) {
+                        parent.insertBefore(parent.childNodes[i], parent.firstChild);
+                    }
+                }
+
+                function updateBoard(game, first) {
+                    var b = document.getElementById('board');
+                    b.innerHTML = "";
+                    game.chessBoard.squares.forEach(entry => {
+                        var child = document.createElement("div");
+                        var t = @(Html.EnumToString<Color>());
+                        child.classList.add("square");
+                        child.classList.add(t[entry.color].toLowerCase());
+
+                        function ClickEvent() {
+                            if (playerId == game.movingPlayer.id) {
+                                connection.invoke("SquareSelected", thisGame.id, playerColor, entry.position.posX, entry.position.posY);
+                                }
+                        }
+
+                        child.addEventListener("click", ClickEvent);
+
+                        if (entry.piece != null) {
+                            var svg = document.createElement("img");
+                            svg.width = 80;
+                            svg.height = 80;
+                            svg.src = "/images/" + t[entry.piece.color].toLowerCase() + "_" + entry.piece.name + ".svg";
+                            child.appendChild(svg);
+
+                            if (entry.piece.color != playerColor && first) {
+                                child.removeEventListener("click", ClickEvent);
+                            }
+                        }
+
+                        if (entry.possibleMove) {
+                            child.classList.add("possible");
+                        }
+
+                        if (entry.isSelected) {
+                            child.classList.add("selected");
+                        }
+
+                        b.appendChild(child);
+                    });
+
+                    if (playerColor == 0) {
+                        reverseChildren(b);
+                    }
+                }
+            });
+</script>

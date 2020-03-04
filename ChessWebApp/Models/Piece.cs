@@ -31,6 +31,8 @@ namespace ChessWebApp.Models
 
         public abstract string Abbrevation { get; }
 
+        public string Name => GetType().Name.ToString();
+
         private Position GetRightDirection(Square end)
         {
             return Directions.FirstOrDefault(x => Position.IsInDirection(x, end.Position));

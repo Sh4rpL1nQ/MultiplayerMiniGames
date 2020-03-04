@@ -9,26 +9,39 @@ using System.Windows;
 using ChessWebApp.Models;
 using ChessWebApp.Models.EventArguments;
 
-namespace WpfChessBackend.Models
+namespace ChessWebApp.Models
 {
     public class Game
     {
-        public Game()
+        public Game(Player player1, Player player2)
         {
             ChessBoard = new Board();
             ChessBoard.MakeBoard(Color.White);
+
+            Player1 = player1;
+            Player2 = player2;
+
+            Id = Guid.NewGuid().ToString("d");
+
+            Player1.GameId = Id;
+            Player2.GameId = Id;
         }
 
-        public void SetSelectedSquare(Square square)
+        public Game()
+        {
+
+        }
+
+        public bool SetSelectedSquare(Square square)
         {
             if (square.Piece != null && square.Piece.Color == MovingPlayer.Color)
-                ChessBoard.PlayerSelectedSquare(square, true);
+                return ChessBoard.PlayerSelectedSquare(square, true);
             else
             {
-                if (ChessBoard.PlayerSelectedSquare(square, false))
-                    ChangeTurns();
-
-                ChessBoard.ClearBoardSelections();
+                var b = ChessBoard.PlayerSelectedSquare(square, false);
+                if (b)
+                    ChangeTurns(); 
+                return b;
             }                
         }
 
@@ -38,7 +51,7 @@ namespace WpfChessBackend.Models
 
         public Board ChessBoard { get; set; }
 
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public Player Player1 { get; set; }
 

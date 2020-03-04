@@ -16,24 +16,24 @@ namespace ChessWebApp.Models
 
         private Dictionary<string, Piece> setup = new Dictionary<string, Piece>()
         {
-            { "A1", new Rook(Color.White) },  { "B1", new Knight(Color.White) }, { "C1", new Bishop(Color.White) }, { "D1", new Queen(Color.White) },
-            { "E1", new King(Color.White) }, { "F1", new Bishop(Color.White) }, { "G1", new Knight(Color.White) }, { "H1", new Rook(Color.White) },
+            { "A1", new Rook(Color.White) },  { "B1", new Knight(Color.White) }, { "C1", new Bishop(Color.White) }, { "D1", new King(Color.White) },
+            { "E1", new Queen(Color.White) }, { "F1", new Bishop(Color.White) }, { "G1", new Knight(Color.White) }, { "H1", new Rook(Color.White) },
             { "A2", new Pawn(Color.White) },  { "B2", new Pawn(Color.White) },   { "C2", new Pawn(Color.White) },   { "D2", new Pawn(Color.White) },
             { "E2", new Pawn(Color.White) },  { "F2", new Pawn(Color.White) },   { "G2", new Pawn(Color.White) },   { "H2", new Pawn(Color.White) },
 
-            { "A8", new Rook(Color.Black) },  { "B8", new Knight(Color.Black) }, { "C8", new Bishop(Color.Black) }, { "D8", new Queen(Color.Black) },
-            { "E8", new King(Color.Black) }, { "F8", new Bishop(Color.Black) }, { "G8", new Knight(Color.Black) }, { "H8", new Rook(Color.Black) },
+            { "A8", new Rook(Color.Black) },  { "B8", new Knight(Color.Black) }, { "C8", new Bishop(Color.Black) }, { "D8", new King(Color.Black) },
+            { "E8", new Queen(Color.Black) }, { "F8", new Bishop(Color.Black) }, { "G8", new Knight(Color.Black) }, { "H8", new Rook(Color.Black) },
             { "A7", new Pawn(Color.Black) },  { "B7", new Pawn(Color.Black) },   { "C7", new Pawn(Color.Black) },   { "D7", new Pawn(Color.Black) },
             { "E7", new Pawn(Color.Black) },  { "F7", new Pawn(Color.Black) },   { "G7", new Pawn(Color.Black) },   { "H7", new Pawn(Color.Black) },
         };
 
-        public ObservableCollection<Square> Squares { get; set; }
+        public List<Square> Squares { get; set; }
 
         private List<Move> currentPossibleMoves;
 
         public Board()
         {
-            Squares = new ObservableCollection<Square>();
+            Squares = new List<Square>();
 
             currentPossibleMoves = new List<Move>();
         }
@@ -42,7 +42,7 @@ namespace ChessWebApp.Models
         {
             this.topColor = topColor;
             var toggle = Color.White;
-            Squares = new ObservableCollection<Square>();
+            Squares = new List<Square>();
             for (int y = 0; y < 8; y++)
             {
                 for (int x = 0; x < 8; x++)
@@ -190,7 +190,7 @@ namespace ChessWebApp.Models
                 if (pieces.Count() != 0)
                     continue;
 
-                if (squares.Last().Position == end.Position)
+                if (squares.LastOrDefault()?.Position == end.Position)
                 {
                     foreach (var m in squares)
                     {
@@ -200,8 +200,7 @@ namespace ChessWebApp.Models
                     }
 
                     return new Move(this, start, end, MoveType.Castle);
-                }
-                    
+                }                   
             }            
 
             return null;
@@ -279,14 +278,17 @@ namespace ChessWebApp.Models
             {
                 var current = currentPossibleMoves.FirstOrDefault(x => x.End.Position == square.Position);
                 if (current != null)
-                {
+                {                    
                     current.Do();
+                    ClearBoardSelections();
                     return true;
                 }
             }
 
             return false;
         }
+
+        public event EventHandler MoveDone;
 
         public List<Move> CalculatePossibleMovesForPiece(Piece piece)
         {

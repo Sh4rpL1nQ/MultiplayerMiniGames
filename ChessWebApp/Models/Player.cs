@@ -9,7 +9,7 @@ namespace ChessWebApp.Models
     {
         private TimeSpan timeRemaining;
 
-        public int Id { get; set; }
+        public string Id { get; set; }
 
         public string GameId { get; set; }
 
@@ -37,7 +37,19 @@ namespace ChessWebApp.Models
         public Player(Color color)
         {
             Color = color;
+            InitializeMove();
+        }
 
+        public Player (string userName, string connectionId)
+        {
+            UserName = userName;
+            Id = connectionId;
+            InitializeMove();
+        }
+
+        
+        public void InitializeMove()
+        {
             if (Color == Color.White)
                 HasToMove = true;
         }

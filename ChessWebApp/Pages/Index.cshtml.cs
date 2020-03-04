@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ChessWebApp.Hubs;
+using ChessWebApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
@@ -10,16 +12,11 @@ namespace ChessWebApp.Pages
 {
     public class IndexModel : PageModel
     {
-        private readonly ILogger<IndexModel> _logger;
+        private GameHub hub;
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(GameHub hub)
         {
-            _logger = logger;
-        }
-
-        public void OnGet()
-        {
-
+            this.hub = hub;
         }
     }
 }
