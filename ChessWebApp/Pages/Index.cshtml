@@ -6,131 +6,231 @@
     ViewData["Title"] = "Home page";
 }
 
-<main id="main" class="container text-center">
-    <h1>Chess</h1>
+    <main id="main" class="container text-center">
+        <h1>Chess</h1>
 
-    <div class="form-inline">
-        <div class="form-group" id="usernameGroup">
-            <label class="sr-only control-label" for="username">Username</label>
-            <input type="text" class="form-control" id="username" placeholder="Username" autofocus />
+        <div id="findOpponent" class="form-inline">
+            <div class="form-group" id="usernameGroup">
+                <label class="sr-only control-label" for="username">Username</label>
+                <input type="text" class="form-control" id="username" placeholder="Username" autofocus />
+            </div>
+            <button type="submit" id="findGame" class="btn btn-primary">Find Game</button>
+            <p id="status" class="help-block">Please enter your desired username.</p>
+            <p id="hidden" class="help-block" style="visibility:hidden"></p>
         </div>
-        <button type="submit" id="findGame" class="btn btn-primary">Find Game</button>
-        <p id="status" class="help-block">Please enter your desired username.</p>
-        <p id="hidden" class="help-block" style="visibility:hidden"></p>
-    </div>
-</main>
-<p id="playerAtTurn"></p>
-<p>ist am Zug!!!</p>
-<div id="board" class="chessboard">
-    
-</div>
+        <p id="playerAtTurn"></p>
+        <p>ist am Zug!!!</p>
+        <div id="board" class="chessboard">
+
+        </div>
+    </main>
 
 <script type="text/javascript">
 
-            $(function () {
-                var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
-                var playerId;
-                var playerColor;
-                var thisGame;
-                document.getElementById("findGame").disabled = true;
+    $(function () {
+        var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
+        var playerId;
+        var playerColor;
 
-                $(".chessboard").on("load", function () {
-                    console.log("target loaded");
-                });
+        document.getElementById("findGame").disabled = true;
 
-                connection.start().then(function () {
-                    document.getElementById("findGame").disabled = false;
-                });
+        $(".chessboard").on("load", function () {
+            console.log("target loaded");
+        });
 
-                connection.on("PlayerJoined", function (player) {
-                    playerId = player.id;
-                });
+        connection.start().then(function () {
+            document.getElementById("findGame").disabled = false;
+        });
 
-                connection.on("OpponentLeft", function () {
-                    $('#status').html("Opponent has left. Game over.");
-                    endGame();
-                });
+        connection.on("PlayerJoined", function (player) {
+            playerId = player.id;
+        });
 
-                connection.on("WaitingList", function () {
-                    $('#status').html("Waiting for an opponent.");
-                });
+        connection.on("OpponentLeft", function () {
+            $('#status').html("Opponent has left. Game over.");
+            endGame();
+        });
 
-                $('#findGame').click(function () {
-                    var chosenUsername = $('#username').val();
-                    connection.invoke("FindGame", chosenUsername);
-                });
+        connection.on("WaitingList", function () {
+            $('#status').html("Waiting for an opponent.");
+        });
 
-                $('#username').keypress(function (e) {
-                    if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-                        $('#findGame').click();
-                        return false;
+        $('#findGame').click(function () {
+            var chosenUsername = $('#username').val();
+            connection.invoke("FindGame", chosenUsername);
+        });
+
+        $('#username').keypress(function (e) {
+            if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+                $('#findGame').click();
+                return false;
+            }
+            return true;
+        });
+
+        connection.on("Start", function (game) {
+            if (game.id != "") {
+                document.getElementById('findOpponent').style.visibility = "hidden";
+                playerColor = (playerId == game.player1.id) ? game.player1.color : game.player2.color;
+                Update(game);
+                document.getElementById('playerAtTurn').innerText = game.movingPlayer.userName;
+            }
+        });
+
+        connection.on("MoveDone", function (game) {
+            Update(game);
+            document.getElementById('playerAtTurn').innerText = game.movingPlayer.userName;
+        });
+
+        connection.on("ShowPossibleMoves", function (game) {
+            var board = document.getElementById('board');
+            resetPossibleMoves(board);
+            for (i = 0; i < 64; i++) {
+                    if (game.chessBoard.squares[i].possibleMove) {
+                        board.children[(game.movingPlayer.color == 0) ? i : 63 - i].classList.add('dropzone');
                     }
-                    return true;
-                });
-
-                connection.on("Start", function (game) {
-                    if (game.id != "") {
-                        thisGame = game;
-                        playerColor = (playerId == game.player1.id) ? game.player1.color : game.player2.color;
-                        updateBoard(game, true);
-                        document.getElementById('playerAtTurn').innerText = game.movingPlayer.userName;              
+                    if (game.chessBoard.squares[i].isSelected) {
+                        board.children[(game.movingPlayer.color == 0) ? i : 63 - i].firstChild.id = 'selected';
                     }
-                });
+                }          
+        });
 
-                connection.on("UpdateBoard", function (game, first) {
-                    updateBoard(game, first);
-                    document.getElementById('playerAtTurn').innerText = game.movingPlayer.userName;
-                });
+        function resetBoard() {
+            var newTag = document.createElement("div");
+            var main = document.getElementById('main');
+            main.removeChild(document.getElementById('board'));
+            main.appendChild(newTag);
+            newTag.classList.add("chessboard");
+            newTag.id = "board";
+        }
 
-                function reverseChildren(parent) {
-                    for (var i = 1; i < parent.childNodes.length; i++) {
-                        parent.insertBefore(parent.childNodes[i], parent.firstChild);
+        function resetPossibleMoves(board) {
+            for (i = 0; i < board.children.length; i++) {
+                board.children[i].classList.remove("dropzone");
+                if (board.children[i].firstChild != null && board.children[i].isSelected) {
+                        board.children[i].firstChild.id = "";
+                    } 
+            };
+        }
+
+        function Update(game) {
+            resetBoard();
+            var b = document.getElementById('board');
+            game.chessBoard.squares.forEach(entry => {
+                var child = document.createElement("div");
+                child.classList.add(entry.name);
+                var t = @(Html.EnumToString<Color>());
+                child.classList.add("square");
+                child.classList.add(t[entry.color].toLowerCase());
+
+                if (entry.piece != null) {
+                    var svg = document.createElement("img");
+                    svg.width = 80;
+                    svg.height = 80;
+                    svg.src = "/images/" + t[entry.piece.color].toLowerCase() + "_" + entry.piece.name + ".svg";
+                    child.appendChild(svg);
+
+                    if (entry.piece.color == playerColor) {
+                        child.addEventListener("mousedown", function () {
+                            connection.invoke("PieceSelected", entry.position.posX, entry.position.posY);
+                            child.firstChild.classList.add(entry.name);
+                        });
+                        child.firstChild.classList.add("drag-drop");
                     }
                 }
 
-                function updateBoard(game, first) {
-                    var b = document.getElementById('board');
-                    b.innerHTML = "";
-                    game.chessBoard.squares.forEach(entry => {
-                        var child = document.createElement("div");
-                        var t = @(Html.EnumToString<Color>());
-                        child.classList.add("square");
-                        child.classList.add(t[entry.color].toLowerCase());
-
-                        function ClickEvent() {
-                            if (playerId == game.movingPlayer.id) {
-                                connection.invoke("SquareSelected", thisGame.id, entry.position.posX, entry.position.posY);
-                                }
-                        }
-
-                        child.addEventListener("click", ClickEvent);
-
-                        if (entry.piece != null) {
-                            var svg = document.createElement("img");
-                            svg.width = 80;
-                            svg.height = 80;
-                            svg.src = "/images/" + t[entry.piece.color].toLowerCase() + "_" + entry.piece.name + ".svg";
-                            child.appendChild(svg);
-
-                            if (entry.piece.color != playerColor && first) {
-                                child.removeEventListener("click", ClickEvent);
-                            }
-                        }
-
-                        if (entry.possibleMove) {
-                            child.classList.add("possible");
-                        }
-
-                        if (entry.isSelected) {
-                            child.classList.add("selected");
-                        }
-
-                        b.appendChild(child);
-                    });
-
-                    if (playerColor == 0) {
-                        reverseChildren(b);
-                    }
-                }
+                b.appendChild(child);
             });
+
+            if (playerColor == 1) {
+                reverseChildren(b);
+            }
+        }
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        function reverseChildren(parent) {
+            for (var i = 1; i < parent.childNodes.length; i++) {
+                parent.insertBefore(parent.childNodes[i], parent.firstChild);
+            }
+        }
+        		let startPos = {x:-1,y:-1};
+		
+
+interact('.drag-drop').draggable({
+	inertia: true,
+	snap: {
+      targets: [startPos],
+      relativePoints: [ { x: 0, y: 0 } ],
+      endOnly: true,
+    },
+	listeners: {
+		start (event) {
+			var rect = interact.getElementRect(event.target);
+
+				startPos = {
+					x: rect.left,
+					y: rect.top
+				}
+				
+				event.interactable.options.drag.snap.targets = [startPos];
+		},
+		move (event) {
+			var target = event.target,
+			x = (parseFloat(target.getAttribute('data-x')) || 0) + event.dx,
+			y = (parseFloat(target.getAttribute('data-y')) || 0) + event.dy;
+
+			target.style.webkitTransform =
+			target.style.transform = 'translate(' + x + 'px, ' + y + 'px)';
+
+			target.setAttribute('data-x', x);
+			target.setAttribute('data-y', y);
+		}
+	}        
+});
+
+        interact('.dropzone').dropzone({
+    accept: '#selected',
+	overlap: 'center',	
+	ondragenter: function (event) {
+		var dropRect = interact.getElementRect(event.target),
+		    dropTarget = {
+		      x: dropRect.left,
+		      y: dropRect.top
+		    };
+    event.draggable.draggable({
+      snap: { targets: [dropTarget] },
+    });
+
+		var draggableElement = event.relatedTarget,
+            dropzoneElement = event.target;
+
+        dropzoneElement.classList.add('drop-target');
+        draggableElement.classList.add('can-drop');
+	},
+            ondragleave: function (event) {
+        event.draggable.draggable({
+      snap: { targets: [startPos] },
+    });
+        event.target.classList.remove('drop-target');
+        event.relatedTarget.classList.remove('can-drop');
+	},
+	ondropactivate: function (event) {
+        event.target.classList.add('drop-active');
+    },
+	ondropdeactivate: function (event) {
+        event.target.classList.remove('drop-active');
+        event.target.classList.remove('drop-target');
+    },
+	ondrop: function (event) {
+	    event.draggable.draggable({
+        snap: { targets: [] },
+        });
+        var piece = event.relatedTarget.classList[1];
+        var square = event.target.classList[0];
+        connection.invoke("MoveSelected", piece, square);
+    }
+});
+    });
+    
 </script>

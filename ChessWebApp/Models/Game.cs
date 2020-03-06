@@ -24,17 +24,10 @@ namespace ChessWebApp.Models
 
         }
 
-        public bool SetSelectedSquare(Square square)
+        public void MoveSelected(Square start, Square end)
         {
-            if (square.Piece != null && square.Piece.Color == MovingPlayer.Color)
-                return ChessBoard.PlayerSelectedSquare(square, true);
-            else
-            {
-                var b = ChessBoard.PlayerSelectedSquare(square, false);
-                if (b)
-                    ChangeTurns();
-                return b;
-            }
+            if (ChessBoard.MakeMove(start, end))
+                ChangeTurns();
         }
 
         public event EventHandler OnGameOver;

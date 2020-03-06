@@ -85,17 +85,31 @@ namespace ChessWebApp.Hubs
             return base.OnConnectedAsync();
         }
 
-        public async Task SquareSelected(string id, int x, int y)
+        public async Task MoveSelected(string a, string b)
         {
-            var game = games[id];
-            if (!game.SetSelectedSquare(game.ChessBoard.Squares.FirstOrDefault(i => i.Position.PosX == x && i.Position.PosY == y)))
-                await Clients.Caller.SendAsync("UpdateBoard", game, false);
-            else
-            {
-                game.ChessBoard.ClearBoardSelections();
-                await Clients.All.SendAsync("UpdateBoard", game, true);
-            }
+            var player = players[Context.ConnectionId];
+            if (!player.HasToMove)
+                return;
 
+            var game = GetGame(player, out Player opponent);
+            var start = game.ChessBoard.GetSquareAtPosition(a);
+            var end = game.ChessBoard.GetSquareAtPosition(b);
+            game.MoveSelected(start, end);
+            await Clients.All.SendAsync("MoveDone", game);
+        }
+
+        public async Task PieceSelected(int x, int y)
+        {
+            var player = players[Context.ConnectionId];
+            if (!player.HasToMove)
+                return;
+
+            var game = GetGame(player, out Player opponent);
+            var square = game.ChessBoard.GetSquareAtPosition(new Position(x, y));           
+            game.ChessBoard.ClearBoardSelections();
+            game.ChessBoard.CalculatePossibleMovesForPiece(square.Piece);
+            square.IsSelected = true;
+            await Clients.All.SendAsync("ShowPossibleMoves", game);
         }
     }
 }

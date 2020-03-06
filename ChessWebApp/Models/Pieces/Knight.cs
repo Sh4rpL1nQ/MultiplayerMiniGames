@@ -8,7 +8,7 @@ namespace ChessWebApp.Models.Pieces
 
         public override IEnumerable<Position> Directions =>
             new List<Position>() { new Position(1, -2), new Position(-1, -2), new Position(1, 2), new Position(-1, 2),
-                                   new Position(-1, -2), new Position(2, 1), new Position(2, -1), new Position(-2, 1) };
+                                   new Position(-2, -1), new Position(2, 1), new Position(2, -1), new Position(-2, 1) };
 
         public Knight(Color color) : base(color)
         {
