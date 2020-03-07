@@ -72,8 +72,7 @@ body {
 
 .black {
     float: left;
-    width: 80px;
-    height: 80px;
+    /*width: 6vw;*/
     background-color: #b58863;
     text-align: center;
     display: table-cell;
@@ -82,34 +81,33 @@ body {
 
 .white {
     float: left;
-    width: 80px;
-    height: 80px;
+    /*width: 6vw;*/
     background-color: #f0d9b5;
     text-align: center;
     display: table-cell;
     vertical-align: middle;
 }
 
+/*.square > img {
+    width: 6vw;
+}*/
+
 .chessboard {
-    width: 640px;
-    height: 640px;
+    /*width: 48vw;*/
     display: inline-block;
 }
 
 .dropzone {
-    border: dashed 4px transparent;
-    transition: background-color 0.3s;
-    background-color: green;
+
 }
 
 .drop-active {
-    border-color: #aaa;
+    border: solid 0px transparent;
 }
 
 .drop-target {
     background-color: #29e;
-    border-color: #fff;
-    border-style: solid;
+    border: solid 0px transparent;
 }
 
 .drag-drop {
@@ -120,3 +118,13 @@ body {
     .drag-drop.can-drop {
         color: #000;        
     }
+
+li img {
+    width: 20px;
+    height: 20px;
+    margin: auto;
+}
+
+li p {
+    margin: 0px;
+}

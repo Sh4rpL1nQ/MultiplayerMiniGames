@@ -24,15 +24,20 @@ namespace ChessWebApp.Models
 
         }
 
-        public void MoveSelected(Square start, Square end)
+        public Move MoveSelected(Square start, Square end)
         {
-            if (ChessBoard.MakeMove(start, end))
+            var move = ChessBoard.MakeMove(start, end);
+            if (move != null)
                 ChangeTurns();
+
+            return move;
         }
 
         public event EventHandler OnGameOver;
 
         public Player MovingPlayer => Player1?.HasToMove ?? false ? Player1 : Player2;
+
+        public Player WaitingPlayer => Player1?.HasToMove ?? false ? Player2 : Player1;
 
         public Board ChessBoard { get; set; }
 

@@ -94,8 +94,8 @@ namespace ChessWebApp.Hubs
             var game = GetGame(player, out Player opponent);
             var start = game.ChessBoard.GetSquareAtPosition(a);
             var end = game.ChessBoard.GetSquareAtPosition(b);
-            game.MoveSelected(start, end);
-            await Clients.All.SendAsync("MoveDone", game);
+            var move = game.MoveSelected(start, end);
+            await Clients.All.SendAsync("MoveDone", game, move);
         }
 
         public async Task PieceSelected(int x, int y)

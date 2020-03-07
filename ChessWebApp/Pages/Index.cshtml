@@ -6,24 +6,60 @@
     ViewData["Title"] = "Home page";
 }
 
-    <main id="main" class="container text-center">
-        <h1>Chess</h1>
+<main id="main" class="container-fluid text-center">
+    <h1>Chess</h1>
 
-        <div id="findOpponent" class="form-inline">
-            <div class="form-group" id="usernameGroup">
-                <label class="sr-only control-label" for="username">Username</label>
-                <input type="text" class="form-control" id="username" placeholder="Username" autofocus />
+    <div id="findOpponent" class="row m-5">
+        <div class="mx-auto my-auto text-center">
+            <p id="status" class="row help-block m-3 text-center">Please enter your desired username.</p>
+            <div class="form-inline">
+                <div class="form-group mr-2" id="usernameGroup">
+                    <label class="sr-only control-label" for="username">Username</label>
+                    <input type="text" class="form-control" id="username" placeholder="Username" autofocus />
+                </div>
+                <button type="submit" id="findGame" class="btn btn-primary">Find Game</button>
+                <p id="hidden" class="help-block" style="visibility:hidden"></p>
             </div>
-            <button type="submit" id="findGame" class="btn btn-primary">Find Game</button>
-            <p id="status" class="help-block">Please enter your desired username.</p>
-            <p id="hidden" class="help-block" style="visibility:hidden"></p>
         </div>
-        <p id="playerAtTurn"></p>
-        <p>ist am Zug!!!</p>
-        <div id="board" class="chessboard">
+    </div>
+</main>
+
+<div id="playground" class="m-3" style="display:none">
+    <div class="row">
+
+        <div class="col-xs-12 col-sm-6 col-md-4">
+            <div id="listOfMoves" class="row">
+                <div class="col-6">
+                    <h4 id="ownListHeader"></h4>
+                    <ul id="ownList" class="list-group">
+                    </ul>
+                </div>
+                <div class="col-6">
+                    <h4 id="enemyListHeader"></h4>
+                    <ul id="enemyList" class="list-group">
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="board" class="chessboard col-xs-12 col-sm-6 col-md-4">
 
         </div>
-    </main>
+
+        <div id="timeView" class="col-xs-12 col-sm-12 col-md-4">
+            <h4 id="timeName"></h4>
+            <div>
+                <p>Status: </p>
+                <p id="timeStatus"></p>
+            </div>
+            <div id="time"></div>
+            <div id="options">
+                <a href="#">Resign</a>
+                <a href="#">Offer Draw</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script type="text/javascript">
 
@@ -31,6 +67,16 @@
         var connection = new signalR.HubConnectionBuilder().withUrl("/gameHub").build();
         var playerId;
         var playerColor;
+        var playerName;
+
+        function displayWindowSize() {
+            var w = $('#board').width();
+            $('.square').width(w / 8.2);
+            $('.square').height(w / 8.2);
+            $('.square > img').width(w / 8.2);
+        }
+
+    window.addEventListener("resize", displayWindowSize);
 
         document.getElementById("findGame").disabled = true;
 
@@ -70,17 +116,45 @@
 
         connection.on("Start", function (game) {
             if (game.id != "") {
-                document.getElementById('findOpponent').style.visibility = "hidden";
+                document.getElementById('findOpponent').style.display = "none";
                 playerColor = (playerId == game.player1.id) ? game.player1.color : game.player2.color;
+                setupPlayground(game);
+                document.getElementById('playground').style.display = "block";
                 Update(game);
-                document.getElementById('playerAtTurn').innerText = game.movingPlayer.userName;
+                playerName = (playerId == game.player1.id) ? game.player1.userName : game.player2.userName;
+                document.getElementById('timeName').innerText = playerName;
+                displayWindowSize();
+                updateStatus(game.movingPlayer.userName);
             }
         });
 
-        connection.on("MoveDone", function (game) {
+        connection.on("MoveDone", function (game, move) {
             Update(game);
-            document.getElementById('playerAtTurn').innerText = game.movingPlayer.userName;
+            updateStatus(game.movingPlayer.userName);
+
+            var li = GenerateListElement(move);
+
+            if (game.movingPlayer.color != playerColor) {
+                var list = document.getElementById('ownList');
+                list.appendChild(li);
+            }
+            else {
+                var list = document.getElementById('enemyList');
+                list.appendChild(li);
+            }
         });
+
+        function updateStatus(name) {
+            var timeStatus = document.getElementById('timeStatus');
+            if (name == playerName) {               
+                timeStatus.innerText = "It's your turn";
+                timeStatus.style.color = "green";
+            }
+            else {
+                timeStatus.innerText = name + " makes his move";
+                timeStatus.style.color = "red";
+            }
+        }
 
         connection.on("ShowPossibleMoves", function (game) {
             var board = document.getElementById('board');
@@ -92,24 +166,70 @@
                     if (game.chessBoard.squares[i].isSelected) {
                         board.children[(game.movingPlayer.color == 0) ? i : 63 - i].firstChild.id = 'selected';
                     }
-                }          
+                }
         });
 
+        function GenerateListElement(move) {
+            var li = document.createElement('li');
+            li.classList.add('list-group-item');
+
+            var t = @(Html.EnumToString<Color>());
+            var div = document.createElement("div");
+            div.classList.add("row");
+            div.style.float = "left";
+            var span1 = document.createElement("p");
+            var span2 = document.createElement("p");
+            var img1 = document.createElement("img");
+            var p = document.createElement("p");
+            p.innerText = move.start.name;    
+            img1.src = "/images/" + t[move.start.piece.color].toLowerCase() + "_" + move.start.piece.name.toLowerCase() + ".svg";
+            span1.appendChild(p);      
+
+            div.appendChild(img1)
+            div.appendChild(span1);
+            var sss = document.createElement("p");
+            sss.innerText = "->";
+            div.appendChild(sss);
+            
+            var img2 = document.createElement("img");
+            img2.width = 20;
+            img2.height = 20;
+            if (move.end.piece != null) {
+                var p = document.createElement("p");
+                p.innerText = move.end.name;
+                img2.src = "/images/" + t[move.end.piece.color].toLowerCase() + "_" + move.end.piece.name.toLowerCase() + ".svg";
+                span2.appendChild(p);
+                div.appendChild(img2);
+            }
+            else {
+                span2.innerText = move.end.name;
+            }
+
+            div.appendChild(span2);
+
+            li.appendChild(div);
+
+            return li;
+        }
+
+        function setupPlayground(game) {
+            var t = @(Html.EnumToString<Color>());
+            var playground = document.getElementById('playground');
+            document.getElementById('ownListHeader').innerText = t[playerColor];
+            document.getElementById('enemyListHeader').innerText = playerColor == 0 ? t[1] : t[0];
+        }
+
         function resetBoard() {
-            var newTag = document.createElement("div");
-            var main = document.getElementById('main');
-            main.removeChild(document.getElementById('board'));
-            main.appendChild(newTag);
-            newTag.classList.add("chessboard");
-            newTag.id = "board";
+            var board = document.getElementById('board');
+            board.innerHTML = "";
         }
 
         function resetPossibleMoves(board) {
             for (i = 0; i < board.children.length; i++) {
                 board.children[i].classList.remove("dropzone");
-                if (board.children[i].firstChild != null && board.children[i].isSelected) {
+                if (board.children[i].firstChild != null) {
                         board.children[i].firstChild.id = "";
-                    } 
+                    }
             };
         }
 
@@ -125,8 +245,7 @@
 
                 if (entry.piece != null) {
                     var svg = document.createElement("img");
-                    svg.width = 80;
-                    svg.height = 80;
+
                     svg.src = "/images/" + t[entry.piece.color].toLowerCase() + "_" + entry.piece.name + ".svg";
                     child.appendChild(svg);
 
@@ -145,6 +264,8 @@
             if (playerColor == 1) {
                 reverseChildren(b);
             }
+
+            displayWindowSize();
         }
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -155,7 +276,7 @@
             }
         }
         		let startPos = {x:-1,y:-1};
-		
+
 
 interact('.drag-drop').draggable({
 	inertia: true,
@@ -172,7 +293,7 @@ interact('.drag-drop').draggable({
 					x: rect.left,
 					y: rect.top
 				}
-				
+
 				event.interactable.options.drag.snap.targets = [startPos];
 		},
 		move (event) {
@@ -185,13 +306,16 @@ interact('.drag-drop').draggable({
 
 			target.setAttribute('data-x', x);
 			target.setAttribute('data-y', y);
-		}
-	}        
+        },
+        end (event) {
+            var test = "";
+        }
+	}
 });
 
         interact('.dropzone').dropzone({
     accept: '#selected',
-	overlap: 'center',	
+	overlap: 'center',
 	ondragenter: function (event) {
 		var dropRect = interact.getElementRect(event.target),
 		    dropTarget = {
@@ -232,5 +356,5 @@ interact('.drag-drop').draggable({
     }
 });
     });
-    
+
 </script>

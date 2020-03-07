@@ -263,15 +263,16 @@ namespace ChessWebApp.Models
             }
         }
 
-        public bool MakeMove(Square start, Square end)
+        public Move MakeMove(Square start, Square end)
         {
+            Move moveName = null;
             var move = currentPossibleMoves.FirstOrDefault(x => x.End.Position == end.Position && x.Start.Position == start.Position);
             if (move == null)
-                return false;
-
+                return null;
+            moveName = move.Clone() as Move;
             move.Do();
             ClearBoardSelections();
-            return true;
+            return moveName;
         }
 
         public List<Move> CalculatePossibleMovesForPiece(Piece piece)
