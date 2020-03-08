@@ -128,3 +128,11 @@ li img {
 li p {
     margin: 0px;
 }
+
+@media only screen and (max-width: 776px) {
+    #listOfMoves {
+        display: none;
+    }
+
+    
+}

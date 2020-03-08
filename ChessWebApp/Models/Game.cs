@@ -17,6 +17,14 @@ namespace ChessWebApp.Models
 
             Player1.GameId = Id;
             Player2.GameId = Id;
+
+            Player1.OnTimeIsOver += Player_OnTimeIsOver;
+            Player2.OnTimeIsOver += Player_OnTimeIsOver;
+        }
+
+        private void Player_OnTimeIsOver(object sender, EventArgs e)
+        {
+            OnGameOver?.Invoke(this, e);
         }
 
         public Game()
@@ -65,7 +73,7 @@ namespace ChessWebApp.Models
             if (gameOverCheck != GameOver.None)
                 OnGameOver?.Invoke(MovingPlayer, new GameOverEventArgs(gameOverCheck));
             if (ChessBoard.CheckDraw())
-                OnGameOver?.Invoke(this, new GameOverEventArgs(GameOver.Draw));
+                OnGameOver?.Invoke(MovingPlayer, new GameOverEventArgs(GameOver.Draw));
         }
     }
 }

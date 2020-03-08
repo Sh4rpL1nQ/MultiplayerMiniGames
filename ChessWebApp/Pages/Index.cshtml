@@ -1,5 +1,6 @@
 ﻿@page
 @using ChessWebApp.Models.Helper;
+@using ChessWebApp.Models.EventArguments;
 @using ChessWebApp.Models;
 @model IndexModel
 @{
@@ -7,7 +8,11 @@
 }
 
 <main id="main" class="container-fluid text-center">
-    <h1>Chess</h1>
+    <div id="timeView" class="row" style="display:none;">
+        <h4 id="timeName"></h4>
+        <p id="timeStatus"></p>
+        <div id="time"></div>
+    </div>
 
     <div id="findOpponent" class="row m-5">
         <div class="mx-auto my-auto text-center">
@@ -26,36 +31,28 @@
 
 <div id="playground" class="m-3" style="display:none">
     <div class="row">
+        <div id="boardContainer" class="col-xs-12 col-sm-6 col-md-6" style="padding:0px;">
+            <div id="board" class="row chessboard col-12" style="margin:0px;padding:0px;">
 
-        <div class="col-xs-12 col-sm-6 col-md-4">
+            </div>
+            <div id="options" class="row text-center">
+                <a class="col-6 text-center" href="#">Resign</a>
+                <a class="col-6 text-center" href="#">Offer Draw</a>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-6 col-md-6 pl-5 pr-5 pb-5">
             <div id="listOfMoves" class="row">
                 <div class="col-6">
-                    <h4 id="ownListHeader"></h4>
+                    <h4 id="ownListHeader" class="text-center"></h4>
                     <ul id="ownList" class="list-group">
                     </ul>
                 </div>
                 <div class="col-6">
-                    <h4 id="enemyListHeader"></h4>
+                    <h4 id="enemyListHeader" class="text-center"></h4>
                     <ul id="enemyList" class="list-group">
                     </ul>
                 </div>
-            </div>
-        </div>
-
-        <div id="board" class="chessboard col-xs-12 col-sm-6 col-md-4">
-
-        </div>
-
-        <div id="timeView" class="col-xs-12 col-sm-12 col-md-4">
-            <h4 id="timeName"></h4>
-            <div>
-                <p>Status: </p>
-                <p id="timeStatus"></p>
-            </div>
-            <div id="time"></div>
-            <div id="options">
-                <a href="#">Resign</a>
-                <a href="#">Offer Draw</a>
             </div>
         </div>
     </div>
@@ -70,10 +67,12 @@
         var playerName;
 
         function displayWindowSize() {
-            var w = $('#board').width();
-            $('.square').width(w / 8.2);
-            $('.square').height(w / 8.2);
-            $('.square > img').width(w / 8.2);
+            var w = $('#boardContainer').width();
+            $('.square').width(w / 8);
+            $('.square').height(w / 8);
+            $('.square > img').width(w / 8);
+
+            $('#options').width(w);
         }
 
     window.addEventListener("resize", displayWindowSize);
@@ -92,9 +91,15 @@
             playerId = player.id;
         });
 
-        connection.on("OpponentLeft", function () {
-            $('#status').html("Opponent has left. Game over.");
+        connection.on("OpponentLeft", function (lost, won) {
+            document.getElementById('timeStatus').innerText = "Status: " + lost.userName + " has left. Game over.";
+            document.getElementById('timeStatus').style.color = "orange";
             endGame();
+        });
+
+        connection.on("GameOver", function (gameOver, winner) {
+            document.getElementById('timeStatus').innerText = winner.userName + " has lost due to " + t[gameOver];
+            document.getElementById('timeStatus').style.color = "yellow";
         });
 
         connection.on("WaitingList", function () {
@@ -120,9 +125,10 @@
                 playerColor = (playerId == game.player1.id) ? game.player1.color : game.player2.color;
                 setupPlayground(game);
                 document.getElementById('playground').style.display = "block";
+                document.getElementById('timeView').style.display = "block";
                 Update(game);
                 playerName = (playerId == game.player1.id) ? game.player1.userName : game.player2.userName;
-                document.getElementById('timeName').innerText = playerName;
+                document.getElementById('timeName').innerText = "Player Name: " + playerName;
                 displayWindowSize();
                 updateStatus(game.movingPlayer.userName);
             }
@@ -144,14 +150,18 @@
             }
         });
 
+        function endGame() {
+
+        }
+
         function updateStatus(name) {
             var timeStatus = document.getElementById('timeStatus');
-            if (name == playerName) {               
-                timeStatus.innerText = "It's your turn";
+            if (name == playerName) {
+                timeStatus.innerText = "Status: It's your turn";
                 timeStatus.style.color = "green";
             }
             else {
-                timeStatus.innerText = name + " makes his move";
+                timeStatus.innerText = "Status: " + name + " has to move";
                 timeStatus.style.color = "red";
             }
         }
@@ -181,16 +191,16 @@
             var span2 = document.createElement("p");
             var img1 = document.createElement("img");
             var p = document.createElement("p");
-            p.innerText = move.start.name;    
+            p.innerText = move.start.name;
             img1.src = "/images/" + t[move.start.piece.color].toLowerCase() + "_" + move.start.piece.name.toLowerCase() + ".svg";
-            span1.appendChild(p);      
+            span1.appendChild(p);
 
             div.appendChild(img1)
             div.appendChild(span1);
             var sss = document.createElement("p");
             sss.innerText = "->";
             div.appendChild(sss);
-            
+
             var img2 = document.createElement("img");
             img2.width = 20;
             img2.height = 20;
@@ -214,7 +224,6 @@
 
         function setupPlayground(game) {
             var t = @(Html.EnumToString<Color>());
-            var playground = document.getElementById('playground');
             document.getElementById('ownListHeader').innerText = t[playerColor];
             document.getElementById('enemyListHeader').innerText = playerColor == 0 ? t[1] : t[0];
         }
@@ -250,7 +259,7 @@
                     child.appendChild(svg);
 
                     if (entry.piece.color == playerColor) {
-                        child.addEventListener("mousedown", function () {
+                        child.addEventListener("pointerdown", function () {
                             connection.invoke("PieceSelected", entry.position.posX, entry.position.posY);
                             child.firstChild.classList.add(entry.name);
                         });
@@ -346,14 +355,15 @@ interact('.drag-drop').draggable({
         event.target.classList.remove('drop-active');
         event.target.classList.remove('drop-target');
     },
-	ondrop: function (event) {
-	    event.draggable.draggable({
-        snap: { targets: [] },
-        });
-        var piece = event.relatedTarget.classList[1];
-        var square = event.target.classList[0];
-        connection.invoke("MoveSelected", piece, square);
-    }
+            ondrop: function (event) {
+                event.draggable.draggable({ snap: { targets: [] } });
+                var piece = event.relatedTarget.classList[1];
+                var square = event.target.classList[0];
+                connection.invoke("MoveSelected", piece, square);
+            },
+            ondown: function (event) {
+                var t = "Test";
+            }
 });
     });
 

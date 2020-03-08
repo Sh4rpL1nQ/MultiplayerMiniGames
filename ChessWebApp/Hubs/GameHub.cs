@@ -1,4 +1,5 @@
 ﻿using ChessWebApp.Models;
+using ChessWebApp.Models.EventArguments;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
@@ -37,7 +38,7 @@ namespace ChessWebApp.Hubs
         {
             Game foundGame;
             if (!this.games.TryRemove(gameId, out foundGame))
-                throw new InvalidOperationException("Game not found.");
+                return;
 
             players.TryRemove(foundGame.Player1.Id, out Player foundPlayer1);
             players.TryRemove(foundGame.Player2.Id, out Player foundPlayer2);
@@ -62,27 +63,18 @@ namespace ChessWebApp.Hubs
                 joiningPlayer.Color = Color.Black;
                 opponent.Color = Color.White;
                 Game game = new Game(opponent, joiningPlayer);
+                game.OnGameOver += Game_OnGameOver;
                 games[game.Id] = game;
 
                 await Task.WhenAll(Groups.AddToGroupAsync(game.Player1.Id, groupName: game.Id), Groups.AddToGroupAsync(game.Player2.Id, groupName: game.Id), Clients.Group(game.Id).SendAsync("Start", game));
             }
         }
 
-        public override Task OnConnectedAsync()
+        private void Game_OnGameOver(object sender, EventArgs e)
         {
-            players.TryGetValue(Context.ConnectionId, out Player leavingPlayer);
+            var eventArgs = e as GameOverEventArgs;
+            Clients.All.SendAsync("GameOver", eventArgs.GameOver, sender as Player);
 
-            if (leavingPlayer != null)
-            {
-                Player opponent;
-                Game ongoingGame = GetGame(leavingPlayer, out opponent);
-                if (ongoingGame != null)
-                {
-                    Clients.Group(ongoingGame.Id).SendAsync("OpponentLeft");
-                    RemoveGame(ongoingGame.Id);
-                }
-            }
-            return base.OnConnectedAsync();
         }
 
         public async Task MoveSelected(string a, string b)
@@ -110,6 +102,25 @@ namespace ChessWebApp.Hubs
             game.ChessBoard.CalculatePossibleMovesForPiece(square.Piece);
             square.IsSelected = true;
             await Clients.All.SendAsync("ShowPossibleMoves", game);
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            Player leavingPlayer;
+            players.TryGetValue(Context.ConnectionId, out leavingPlayer);
+
+            if (leavingPlayer != null)
+            {
+                Player opponent;
+                Game ongoingGame = GetGame(leavingPlayer, out opponent);
+                if (ongoingGame != null)
+                {
+                    Clients.Group(ongoingGame.Id).SendAsync("OpponentLeft", leavingPlayer, opponent);
+                    RemoveGame(ongoingGame.Id);
+                }
+            }
+
+            return base.OnDisconnectedAsync(exception);
         }
     }
 }
