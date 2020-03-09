@@ -11,7 +11,12 @@
     <div id="timeView" class="row" style="display:none;">
         <h4 id="timeName"></h4>
         <p id="timeStatus"></p>
-        <div id="time"></div>
+        <div class="timeO">
+            
+        </div>
+        <div class="timeE">
+            
+        </div>
     </div>
 
     <div id="findOpponent" class="row m-5">
@@ -31,7 +36,7 @@
 
 <div id="playground" class="m-3" style="display:none">
     <div class="row">
-        <div id="boardContainer" class="col-xs-12 col-sm-6 col-md-6" style="padding:0px;">
+        <div id="boardContainer" class="col-xs-12 col-sm-12 col-md-6" style="padding:0px;">
             <div id="board" class="row chessboard col-12" style="margin:0px;padding:0px;">
 
             </div>
@@ -65,6 +70,7 @@
         var playerId;
         var playerColor;
         var playerName;
+        var gameOver;
 
         function displayWindowSize() {
             var w = $('#boardContainer').width();
@@ -78,10 +84,6 @@
     window.addEventListener("resize", displayWindowSize);
 
         document.getElementById("findGame").disabled = true;
-
-        $(".chessboard").on("load", function () {
-            console.log("target loaded");
-        });
 
         connection.start().then(function () {
             document.getElementById("findGame").disabled = false;
@@ -98,8 +100,10 @@
         });
 
         connection.on("GameOver", function (gameOver, winner) {
+            var t = @(Html.EnumToString<GameOver>());
             document.getElementById('timeStatus').innerText = winner.userName + " has lost due to " + t[gameOver];
-            document.getElementById('timeStatus').style.color = "yellow";
+            document.getElementById('timeStatus').style.color = "purple";
+            endGame();
         });
 
         connection.on("WaitingList", function () {
@@ -109,6 +113,7 @@
         $('#findGame').click(function () {
             var chosenUsername = $('#username').val();
             connection.invoke("FindGame", chosenUsername);
+            document.getElementById("findGame").disabled = true;
         });
 
         $('#username').keypress(function (e) {
@@ -136,7 +141,9 @@
 
         connection.on("MoveDone", function (game, move) {
             Update(game);
-            updateStatus(game.movingPlayer.userName);
+            if (!gameOver) {
+                updateStatus(game.movingPlayer.userName);
+            }
 
             var li = GenerateListElement(move);
 
@@ -151,7 +158,8 @@
         });
 
         function endGame() {
-
+            gameOver = true;
+            document.getElementById('baord').style.pointerEvents = "none";
         }
 
         function updateStatus(name) {
@@ -259,7 +267,7 @@
                     child.appendChild(svg);
 
                     if (entry.piece.color == playerColor) {
-                        child.addEventListener("pointerdown", function () {
+                        child.addEventListener("mousedown", function () {
                             connection.invoke("PieceSelected", entry.position.posX, entry.position.posY);
                             child.firstChild.classList.add(entry.name);
                         });

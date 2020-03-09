@@ -1,11 +1,14 @@
 ﻿using ChessWebApp.Models.EventArguments;
 using System;
+using System.Threading;
 
 namespace ChessWebApp.Models
 {
     public class Player
     {
-        private TimeSpan timeRemaining;
+        private TimeSpan startingTime;
+        private Timer timer;
+        private string timeRemaining;
 
         public string Id { get; set; }
 
@@ -19,16 +22,12 @@ namespace ChessWebApp.Models
 
         public bool HasToMove { get; set; }
 
-        public TimeSpan TimeRemaining
+        public string TimeRemaining
         {
             get { return timeRemaining; }
-            set
-            {
-                timeRemaining = value;
-                if (timeRemaining == TimeSpan.Zero)
-                    OnTimeIsOver?.Invoke(this, new GameOverEventArgs(GameOver.TimeIsOver));
-            }
+            set { timeRemaining = value; }
         }
+
 
         public event EventHandler OnTimeIsOver;
 
