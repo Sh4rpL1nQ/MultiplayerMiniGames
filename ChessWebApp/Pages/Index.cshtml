@@ -267,10 +267,19 @@
                     child.appendChild(svg);
 
                     if (entry.piece.color == playerColor) {
-                        child.addEventListener("mousedown", function () {
+                        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                            child.addEventListener("touchstart", function () {
                             connection.invoke("PieceSelected", entry.position.posX, entry.position.posY);
                             child.firstChild.classList.add(entry.name);
                         });
+                        }
+                        else {
+                            child.addEventListener("mousedown", function () {
+                            connection.invoke("PieceSelected", entry.position.posX, entry.position.posY);
+                            child.firstChild.classList.add(entry.name);
+                        });
+                        }
+                        
                         child.firstChild.classList.add("drag-drop");
                     }
                 }
