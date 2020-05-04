@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 
-namespace ChessWebApp.Models.Helper
+namespace MiniGames.Models.Helper
 {
     public static class Extensions
     {

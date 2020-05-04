@@ -1,7 +1,7 @@
-﻿using ChessWebApp.Hubs;
-using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using MiniGames.Hubs;
 
-namespace ChessWebApp.Pages
+namespace MiniGames.Pages
 {
     public class IndexModel : PageModel
     {

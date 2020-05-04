@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ChessWebApp.Hubs;
+using MiniGames.Hubs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace ChessWebApp
+namespace MiniGames.Pages
 {
     public class ChessPageModel : PageModel
     {

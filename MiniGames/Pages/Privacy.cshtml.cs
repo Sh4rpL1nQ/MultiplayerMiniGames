@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace ChessWebApp.Pages
+namespace MiniGames.Pages
 {
     public class PrivacyModel : PageModel
     {
