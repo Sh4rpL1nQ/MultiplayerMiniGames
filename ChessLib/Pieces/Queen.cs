@@ -1,16 +1,18 @@
 ﻿using System.Collections.Generic;
 
-namespace ChessWebApp.Models.Pieces
+namespace ChessLib.Pieces
 {
-    public class Bishop : Piece
+    public class Queen : Piece
     {
-        public override string Abbrevation => "B";
+        public override string Abbrevation => "Q";
 
         public override IEnumerable<Position> Directions =>
-            new List<Position>() { new Position(1, -1), new Position(1, 1), new Position(-1, -1), new Position(-1, 1) };
+            new List<Position>() { new Position(1, -1), new Position(1, 1), new Position(0, -1), new Position(-1, 0),
+                                   new Position(0, 1), new Position(1, 0), new Position(-1, -1), new Position(-1, 1) };
 
-        public Bishop(Color color) : base(color)
+        public Queen(Color color) : base(color)
         {
+
         }
 
         public override bool IsReachable(Position dir, Square square)
@@ -20,7 +22,7 @@ namespace ChessWebApp.Models.Pieces
 
         public override object Clone()
         {
-            return new Bishop(Color)
+            return new Queen(Color)
             {
                 NumberOfMoves = NumberOfMoves,
                 Position = Position.Clone() as Position

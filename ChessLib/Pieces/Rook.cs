@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ChessWebApp.Models.Pieces
+namespace ChessLib.Pieces
 {
     public class Rook : Piece
     {

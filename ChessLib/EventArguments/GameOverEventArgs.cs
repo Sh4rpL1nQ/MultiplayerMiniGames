@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChessWebApp.Models.EventArguments
+namespace ChessLib.EventArguments
 {
     public class GameOverEventArgs : EventArgs
     {

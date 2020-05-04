@@ -1,28 +1,28 @@
 ﻿using System.Collections.Generic;
 
-namespace ChessWebApp.Models.Pieces
+namespace ChessLib.Pieces
 {
-    public class Queen : Piece
+    public class King : Piece
     {
-        public override string Abbrevation => "Q";
+        public override string Abbrevation => "K";
 
         public override IEnumerable<Position> Directions =>
             new List<Position>() { new Position(1, -1), new Position(1, 1), new Position(0, -1), new Position(-1, 0),
                                    new Position(0, 1), new Position(1, 0), new Position(-1, -1), new Position(-1, 1) };
 
-        public Queen(Color color) : base(color)
+        public King(Color color) : base(color)
         {
 
         }
 
         public override bool IsReachable(Position dir, Square square)
         {
-            return dir != null;
+            return Position + dir == square.Position;
         }
 
         public override object Clone()
         {
-            return new Queen(Color)
+            return new King(Color)
             {
                 NumberOfMoves = NumberOfMoves,
                 Position = Position.Clone() as Position

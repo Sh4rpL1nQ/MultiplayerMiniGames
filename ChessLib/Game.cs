@@ -1,7 +1,7 @@
-﻿using ChessWebApp.Models.EventArguments;
+﻿using ChessLib.EventArguments;
 using System;
 
-namespace ChessWebApp.Models
+namespace ChessLib
 {
     public class Game
     {

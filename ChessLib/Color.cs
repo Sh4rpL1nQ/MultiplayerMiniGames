@@ -1,4 +1,4 @@
-﻿namespace ChessWebApp.Models
+﻿namespace ChessLib
 {
     public enum Color
     {

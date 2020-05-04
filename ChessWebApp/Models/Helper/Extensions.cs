@@ -15,5 +15,7 @@ namespace ChessWebApp.Models.Helper
 
             return new HtmlString(JsonConvert.SerializeObject(enumDictionary));
         }
+
+
     }
 }

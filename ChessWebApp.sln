@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessWebApp", "ChessWebApp\ChessWebApp.csproj", "{FDD0269A-59DE-4F53-B280-5649A3DDFE2F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessWebApp", "ChessWebApp\ChessWebApp.csproj", "{FDD0269A-59DE-4F53-B280-5649A3DDFE2F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessLib", "ChessLib\ChessLib.csproj", "{B3F6E65C-AB34-4078-A7FB-0F422976D09F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SkribblLib", "SkribblLib\SkribblLib.csproj", "{320B39D7-982F-4619-A09D-472361830BDD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{FDD0269A-59DE-4F53-B280-5649A3DDFE2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FDD0269A-59DE-4F53-B280-5649A3DDFE2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FDD0269A-59DE-4F53-B280-5649A3DDFE2F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3F6E65C-AB34-4078-A7FB-0F422976D09F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3F6E65C-AB34-4078-A7FB-0F422976D09F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3F6E65C-AB34-4078-A7FB-0F422976D09F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3F6E65C-AB34-4078-A7FB-0F422976D09F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{320B39D7-982F-4619-A09D-472361830BDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{320B39D7-982F-4619-A09D-472361830BDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{320B39D7-982F-4619-A09D-472361830BDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{320B39D7-982F-4619-A09D-472361830BDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

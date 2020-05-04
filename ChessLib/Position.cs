@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace ChessWebApp.Models
+namespace ChessLib
 {
     public class Position : ICloneable
     {

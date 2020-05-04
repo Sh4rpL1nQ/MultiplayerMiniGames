@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ChessWebApp.Models
+namespace ChessLib
 {
     public abstract class Piece : ICloneable
     {

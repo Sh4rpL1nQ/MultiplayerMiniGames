@@ -1,5 +1,5 @@
-﻿using ChessWebApp.Models;
-using ChessWebApp.Models.EventArguments;
+﻿using ChessLib;
+using ChessLib.EventArguments;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Concurrent;
@@ -37,7 +37,7 @@ namespace ChessWebApp.Hubs
         private void RemoveGame(string gameId)
         {
             Game foundGame;
-            if (!this.games.TryRemove(gameId, out foundGame))
+            if (!games.TryRemove(gameId, out foundGame))
                 return;
 
             players.TryRemove(foundGame.Player1.Id, out Player foundPlayer1);
@@ -66,7 +66,9 @@ namespace ChessWebApp.Hubs
                 game.OnGameOver += Game_OnGameOver;
                 games[game.Id] = game;
 
-                await Task.WhenAll(Groups.AddToGroupAsync(game.Player1.Id, groupName: game.Id), Groups.AddToGroupAsync(game.Player2.Id, groupName: game.Id), Clients.Group(game.Id).SendAsync("Start", game));
+                await Task.WhenAll(Groups.AddToGroupAsync(game.Player1.Id, groupName: game.Id), 
+                    Groups.AddToGroupAsync(game.Player2.Id, groupName: game.Id), 
+                    Clients.Group(game.Id).SendAsync("Start", game));
             }
         }
 

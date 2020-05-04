@@ -1,8 +1,8 @@
-﻿using ChessWebApp.Models.EventArguments;
+﻿using ChessLib.EventArguments;
 using System;
 using System.Threading;
 
-namespace ChessWebApp.Models
+namespace ChessLib
 {
     public class Player
     {

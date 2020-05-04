@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 
-namespace ChessWebApp.Models.Pieces
+namespace ChessLib.Pieces
 {
-    public class King : Piece
+    public class Knight : Piece
     {
-        public override string Abbrevation => "K";
+        public override string Abbrevation => "Kt";
 
         public override IEnumerable<Position> Directions =>
-            new List<Position>() { new Position(1, -1), new Position(1, 1), new Position(0, -1), new Position(-1, 0),
-                                   new Position(0, 1), new Position(1, 0), new Position(-1, -1), new Position(-1, 1) };
+            new List<Position>() { new Position(1, -2), new Position(-1, -2), new Position(1, 2), new Position(-1, 2),
+                                   new Position(-2, -1), new Position(2, 1), new Position(2, -1), new Position(-2, 1) };
 
-        public King(Color color) : base(color)
+        public Knight(Color color) : base(color)
         {
 
         }
@@ -22,7 +22,7 @@ namespace ChessWebApp.Models.Pieces
 
         public override object Clone()
         {
-            return new King(Color)
+            return new Knight(Color)
             {
                 NumberOfMoves = NumberOfMoves,
                 Position = Position.Clone() as Position

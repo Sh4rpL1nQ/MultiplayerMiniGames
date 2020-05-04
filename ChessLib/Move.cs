@@ -1,8 +1,8 @@
-﻿using ChessWebApp.Models.Pieces;
+﻿using ChessLib.Pieces;
 using System;
 using System.Linq;
 
-namespace ChessWebApp.Models
+namespace ChessLib
 {
     public class Move : ICloneable
     {

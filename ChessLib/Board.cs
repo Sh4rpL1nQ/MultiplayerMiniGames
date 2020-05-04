@@ -1,10 +1,10 @@
-﻿using ChessWebApp.Models.EventArguments;
-using ChessWebApp.Models.Pieces;
+﻿using ChessLib.EventArguments;
+using ChessLib.Pieces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ChessWebApp.Models
+namespace ChessLib
 {
     public class Board : ICloneable
     {

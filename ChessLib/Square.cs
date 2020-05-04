@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChessWebApp.Models
+namespace ChessLib
 {
     public class Square : ICloneable
     {
