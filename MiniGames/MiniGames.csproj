@@ -10,11 +10,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ChessLib\ChessLib.csproj" />
+    <ProjectReference Include="..\LudoLib\LudoLib.csproj" />
     <ProjectReference Include="..\SkribblLib\SkribblLib.csproj" />
   </ItemGroup>
 
